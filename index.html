@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Локальная LLM: инструкция по установке</title>
+    <style>
+        /* Плавная прокрутка страницы */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #24292f;
+            background-color: #ffffff;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            border-bottom: 1px solid #d8dee4;
+            padding-bottom: 8px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 40px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #eaeef2;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        /* Стилизация оглавления */
+        .table-of-contents {
+            background-color: #f6f8fa;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            padding: 16px 24px;
+            margin-bottom: 40px;
+        }
+
+        .table-of-contents h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            color: #57606a;
+        }
+
+        .table-of-contents ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .table-of-contents li {
+            margin-bottom: 6px;
+        }
+
+        .table-of-contents a {
+            color: #0969da;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .table-of-contents a:hover {
+            text-decoration: underline;
+        }
+
+        /* Контейнер для блока кода */
+        .code-container {
+            position: relative;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            background-color: #f6f8fa;
+            margin-bottom: 20px;
+        }
+
+        /* Кнопка копирования */
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #57606a;
+            background-color: #f6f8fa;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.15s ease;
+        }
+
+        .copy-button:hover {
+            background-color: #f3f4f6;
+            border-color: #8c959f;
+            color: #24292f;
+        }
+
+        .copy-button.success {
+            color: #1a7f37;
+            background-color: #f0fdf4;
+            border-color: #4ac26b;
+        }
+
+        .copy-button .icon-check {
+            display: none;
+        }
+
+        .copy-button.success .icon-copy {
+            display: none;
+        }
+
+        .copy-button.success .icon-check {
+            display: block;
+        }
+
+        .page-image {
+            max-width: 100%;     /* Чтобы картинка не вылезала за края экрана */
+            height: auto;        /* Сохраняет пропорции */
+            display: block;
+            margin: 20px 0;      /* Отступы сверху и снизу */
+            border: 1px solid #d0d7de; /* Тонкая серая рамка */
+            border-radius: 6px;  /* Скругление углов */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Легкая тень */
+        }
+
+        /* Стилизация самого кода */
+        pre {
+            margin: 0;
+            padding: 16px;
+            overflow: auto;
+            font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        code {
+            white-space: pre;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Локальная LLM: установка на сервер, настройка графического интерфейса</h1>
+    
+    <nav class="table-of-contents">
+        <h3>Содержание:</h3>
+        <ul>
+            <li><a href="#intro">Введение</a></li>
+            <li><a href="#ollama">Установка и настройка Ollama</a></li>
+            <li><a href="#docker">Установка Docker</a></li>
+            <li><a href="#openwebui">Установка OpenWebUI</a></li>
+            <li><a href="#admin">Веб-интерфейс: регистрация администратора</a></li>
+            <li><a href="#user">Веб-интерфейс: регистрация пользователей</a></li>
+        </ul>
+    </nav>
+
+    <div id="intro">
+        <h2>Введение</h2>
+        <p>Здесь приводится краткая инструкция по установке локальной LLM на сервер и настройке графического веб-интерфейса для неё. </p>
+        <p>Развёртывание LLM на собственном компьютере или сервере имеет следующие преимущества:
+            <ul>
+              <li>конфиденциальность данных: все запросы не отправляются на удалённый сервер, а остаются на вашем компьютере/сервере,</li>
+              <li>независимость от интернет-подключения: LLM на вашем ПК будет доступна даже в отсутствие доступа к интернету,</li>
+              <li>независимость от ограничений доступа к удалённым серверам: доступ к локальной LLM не зависит от блокировок сайтов;
+              <li>отсутствие платных подписок: вы не платите за запросы к API LLM,</li>
+              <li>гибкость настроек: локальную LLM можно дообучить для решения конкретного типа задач.</li>
+            </ul>
+        </p>
+        <p>Однако локальные LLM требуют достаточно больших вычислительных мощностей, в идеале — GPU. Такие компьютеры обычно недоступны рядовым пользователям, но некоторые LLM с относительно небольшим числом параметров можно запустить и на CPU при условии достаточного объёма оперативной памяти. Такие модели будут уступать полноценным большим LLM типа новейших версий Gemini или Qwen, но для ряда задач их может оказаться достаточно, особенно при условии их дообучения.</p>
+        <p>Для развёртывания локальной LLM можно использовать обычный персональный компьютер или арендовать сервер. При установке локальной LLM на ПК она будет доступна только с этого ПК. Если есть необходимость обеспечить удалённый и постоянный доступ к LLM для широкого круга пользователей, лучшим решением будет установка LLM на сервер.</p>
+        <p>Данная инструкция ориентирована на запуск локальной LLM на сервере без мощной видеокарты и написана на основе опыта работы с сервером со следующими характеристиками:
+        <ul>
+          <li>Ubuntu 24.04 LTS,</li>
+          <li>16 ГБ RAM,</li>
+          <li>60 ГБ дискового пространства,</li>
+          <li>CPU 4x2.2 ГГц.</li>
+        </ul>
+        </p>
+        <p>При наличии подходящих комплектующих можно организовать работу своего личного сервера (который будет "физически" принадлежать вам). (По сути, сервер — это всего лишь компьютер, который круглосуточно включён в сеть и готов отвечать на запросы с устройств-"клиентов".) Однако на практике это не всегда удобно, поэтому серверы чаще арендуют у компаний-провайдеров. </p>
+        <p>Для аренды сервера достаточно выбрать провайдера (Hostiman, RUVDS, ...), зарегистрироваться на его сайте, выбрать конфигурацию сервера и оплатить доступ. По состоянию на июнь 2026 года аренда сервера с перечисленными выше характеристиками стоит 3-4 тысячи рублей в месяц; чем лучше характеристики сервера, тем выше стоимость. </p>
+        <p>Можно арендовать сервер и с ОС Windows, но для большинства задач (не только связанных с локальными LLM) удобнее Linux.</p>
+        <p>Доступ к арендованному серверу осуществляется по протоколу SSH через командную строку. Вам потребуется установить на свой ПК c Windows SSH-клиент (например, PuTTY), и у вас появится доступ к терминалу сервера: вы сможете писать там команды, как при работе с обычным ПК с Linux.</p>
+        <p>В данной инструкции для развёртывания LLM используется связка Ollama + OpenWebUI. Это не единственное возможное решение, но одно из наиболее популярных и относительно простых: вам потребуется лишь установить необходимые программы на сервер, а все настройки LLM можно будет осуществлять через графический веб-интерфейс, который будет доступен "из коробки".</p>
+        
+    <div id="ollama">
+        <h2>Установка и настройка Ollama</h2>
+        <p>Итак, вы арендовали сервер с Ubuntu или собрали ПК с аналогичными характеристиками. Для начала установим Ollama — программу с открытым исходным кодом, которая предназначена для локального запуска различных LLM. </p>
+        <p>Перед установкой обновим индексы пакетов и систему:
+        <div class="code-container">
+            <button class="copy-button" aria-label="Копировать код">
+                <svg class="icon-copy" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg>
+                <svg class="icon-check" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg>
+            </button>
+            <pre><code>sudo apt update && sudo apt upgrade -y</code></pre>
+        </div>
+        </p>
+        <p>Устанавливаем Ollama:
+        <div class="code-container">
+            <button class="copy-button" aria-label="Копировать код">
+                <svg class="icon-copy" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg>
+                <svg class="icon-check" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg>
+            </button>
+            <pre><code>curl -fsSL https://ollama.com/install.sh | sh</code></pre>
+        </div>
+        </p>
+        <p>После установки появится предупреждение: "No NVIDIA/AMD GPU detected. Ollama will run in CPU-only mode". Это нормально, в нашей конфигурации сервера действительно нет GPU, поэтому LLM будет работать на CPU.</p>
+        <p>Загрузим и запустим модель qwen2.5:3b. Это небольшая модель, которая "понимает" русский язык и будет хорошо работать на 16 ГБ RAM:
+        <div class="code-container">
+            <button class="copy-button" aria-label="Копировать код">
+                <svg class="icon-copy" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg>
+                <svg class="icon-check" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg>
+            </button>
+            <pre><code>ollama run qwen2.5:3b</code></pre>
+        </div>
+        </p>
+        <p>После загрузки Ollama предложит написать сообщение. Напишите что-нибудь для проверки, дождитесь ответа и нажмите <code>Ctrl+D</code> для выхода. Итак, Ollama установлена.</p>
+        <p>Теперь разрешим Ollama принимать подключения со всех адресов, чтобы впоследствии программа, которая будет отвечать за веб-интерфейс, могла взаимодействовать с LLM.</p>
+        <p>Откройте файл конфигурации Ollama:
+        <div class="code-container">
+            <button class="copy-button" aria-label="Копировать код">
+                <svg class="icon-copy" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg>
+                <svg class="icon-check" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg>
+            </button>
+            <pre><code>sudo systemctl edit ollama.service</code></pre>
+        </div>
+        </p>
+        <p>Вставьте эти строки:
+        <div class="code-container">
+            <button class="copy-button" aria-label="Копировать код">
+                <svg class="icon-copy" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg>
+                <svg class="icon-check" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg>
+            </button>
+            <pre><code>[Service]
+Environment="OLLAMA_HOST=0.0.0.0"
+Environment="OLLAMA_ORIGINS=*"</code></pre>
+        </div>
+        Сохраните файл (в редакторе nano это команды: <code>Ctrl + O</code>, затем <code>Enter</code>, затем выход <code>Ctrl + X</code>). Проследите, чтобы файл сохранился под именем <code>ollama.service</code>, а не каким-то другим, и в исходной директории. 
+        </p>
+        <p>Перезапустите службу Ollama, чтобы применить настройки:
+        <div class="code-container">
+            <button class="copy-button" aria-label="Копировать код">
+                <svg class="icon-copy" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg>
+                <svg class="icon-check" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg>
+            </button>
+            <pre><code>sudo systemctl daemon-reload
+sudo systemctl restart ollama</code></pre>
+        </div>
+        </p>
+    </div>
+
+    <div id="docker">
+        <h2>Установка Docker</h2>
+        <p>Чтобы "общаться" с установленной нами LLM через привычный графический интерфейс с чатом, мы воспользуемся готовым веб-интерфейсом OpenWebUI. Для его запуска нам потребуется Docker. Установим его по инструкции с <a href="https://docs.docker.com/engine/install/ubuntu/" target="_blank">официального сайта</a>. </p>
+        <p>Удалим возможные конфликтующие пакеты:
+        <div class="code-container">
+            <button class="copy-button" aria-label="Копировать код">
+                <svg class="icon-copy" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg>
+                <svg class="icon-check" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg>
+            </button>
+            <pre><code>sudo apt remove $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc | cut -f1)</code></pre>
+        </div>
+        </p>
+        <p>Настраиваем apt-репозиторий:
+        <div class="code-container">
+            <button class="copy-button" aria-label="Копировать код">
+                <svg class="icon-copy" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg>
+                <svg class="icon-check" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg>
+            </button>
+            <pre><code>sudo apt update
+sudo apt install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+sudo tee /etc/apt/sources.list.d/docker.sources &lt;&lt;EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Architectures: $(dpkg --print-architecture)
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+sudo apt update</code></pre>
+        </div>
+        </p>
+        <p>Устанавливаем пакеты:
+        <div class="code-container">
+            <button class="copy-button" aria-label="Копировать код">
+                <svg class="icon-copy" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg>
+                <svg class="icon-check" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg>
+            </button>
+            <pre><code>sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</code></pre>
+        </div>
+        </p>
+        <p>Убеждаемся, что Docker запустился после установки:
+        <div class="code-container">
+            <button class="copy-button" aria-label="Копировать код">
+                <svg class="icon-copy" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg>
+                <svg class="icon-check" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg>
+            </button>
+            <pre><code>sudo systemctl status docker</code></pre>
+        </div>
+        </p>
+        <p>Если не запустился, то запускаем принудительно:
+        <div class="code-container">
+            <button class="copy-button" aria-label="Копировать код">
+                <svg class="icon-copy" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg>
+                <svg class="icon-check" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg>
+            </button>
+            <pre><code>sudo systemctl start docker</code></pre>
+        </div>
+        </p>
+        <p>Включаем автозапуск Docker при запуске сервера:
+        <div class="code-container">
+            <button class="copy-button" aria-label="Копировать код">
+                <svg class="icon-copy" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg>
+                <svg class="icon-check" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg>
+            </button>
+            <pre><code>sudo systemctl enable --now docker</code></pre>
+        </div>
+        </p>
+    </div>
+
+
+    <div id="openwebui">
+        <h2>Установка OpenWebUI</h2>
+        <p>Загрузим и запустим docker-контейнер OpenWebUI:
+        <div class="code-container">
+            <button class="copy-button" aria-label="Копировать код">
+                <svg class="icon-copy" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg>
+                <svg class="icon-check" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg>
+            </button>
+            <pre><code>sudo docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main</code></pre>
+        </div>
+        Теперь на нашем сервере запущен веб-интерфейс, который может взаимодействовать с развёрнутой LLM. 
+        </p>
+
+    </div>
+
+    <div id="admin">
+        <h2>Веб-интерфейс: регистрация администратора</h2>
+        <p>На вашем ПК в адресной строке браузера введите:
+        <div class="code-container">
+            <button class="copy-button" aria-label="Копировать код">
+                <svg class="icon-copy" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg>
+                <svg class="icon-check" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg>
+            </button>
+            <pre><code>http://IP_АДРЕС_ВАШЕГО_СЕРВЕРА:3000</code></pre>
+        </div>
+        Откроется страница с формой регистрации. Заполните требуемые поля и войдите в аккаунт. Откроется графический интерфейс с чатом. Первый пользователь, который регистрируется на этой странице, автоматически становится администратором. Администратор может управлять установленными LLM, дополнительно обучать их, задавать системные промпты, видеть статистику запросов и управлять регистрацией и правами новых пользователей. 
+        </p>
+        <p>В рабочем поле наверху слева кликнике на меню выбора языковой модели и выберите установленную нами qwen2.5:3b. Введите вопрос в поле ввода, дождитесь ответа. Готово! Вы общаетесь с LLM, установленной локально на вашем сервере. 
+            <img class="page-image" src="images/admin_0.JPG" alt="Графический интерфейс">
+        </p>
+        <p>Если вдруг доступных моделей в меню выбора нет, кликните по кружку с инициалами пользователя наверху справа и в выпадающем меню выберите "Панель администратора". Зайдите на вкладку "Настройки", слева выберите раздел "Модели" и включите qwen2.5:3b. Заодно сразу нажмите на иконку карандаша рядом с названием модели и в открывшемся окне выберите "Публичное" в настройках доступа: тогда эта модель станет доступна не только администратору, но и всем остальным пользователям, которые зарегистрируются впоследствии. 
+            <img class="page-image" src="images/admin_1.png" alt="Панель администратора">
+            <img class="page-image" src="images/admin_3.JPG" alt="Модели">
+        </p>
+        <p>Обратите внимание, что в настройках модели вы также можете задать системный промпт и загрузить базу знаний, что позволит более точно настроить LLM для решения ваших задач. 
+        <p>В панели администратора зайдите на вкладку "Настройки" и в разделе "Аутентификация" включите регистрацию новых пользователей и настройте для них роль по умолчанию ("ожидающий", если требуется подтверждение регистрации администратором, и "пользователь", если ручное подтверждение не требуется, — тогда каждый новый пользователь сразу после регистрации сможет начать пользоваться LLM).
+            <img class="page-image" src="images/admin_2.JPG" alt="Пользователи">
+        </p>
+
+    </div>
+
+    <div id="user">
+        <h2>Веб-интерфейс: регистрация пользователей</h2>
+        <p>После перечисленных действий любой человек может перейти по тому же адресу и зарегистрироваться в качестве нового пользователя. Ему будет доступен тот же графический интерфейс, но с меньшими правами. Администратор будет иметь доступ к истории чатов пользователей и статистике по числу запросов к LLM.</p>
+        <p>Поскольку LLM установлена на сервере, эта веб-страница будет доступна всегда, когда включён сервер (это обеспечивается провайдером) и запущены служба Ollama и веб-интерфейс (это мы настроили самостоятельно на этапе установки ПО на сервер). В случае очень большого числа запросов от пользователей время ответов LLM может увеличиваться, поскольку возрастёт нагрузка на сервер. Но на практике локальные LLM обычно используются небольшим числом пользователей, которые при обычных сценариях использования LLM не смогут создать нагрузку на сервер, достаточную для ощутимого замедления работы модели. 
+        </p>
+
+    </div>
+
+    <script>
+        // Универсальный скрипт для обработки кликов по ВСЕМ кнопкам копирования
+        document.querySelectorAll('.copy-button').forEach(button => {
+            button.addEventListener('click', function() {
+                // Находим блок code, который находится в том же контейнере, что и нажатая кнопка
+                const container = this.closest('.code-container');
+                const codeText = container.querySelector('code').innerText;
+
+                navigator.clipboard.writeText(codeText).then(() => {
+                    this.classList.add('success');
+                    setTimeout(() => {
+                        this.classList.remove('success');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Ошибка при копировании: ', err);
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
